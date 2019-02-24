@@ -41,6 +41,7 @@ struct Node *createList(){
 
 struct Node* newSchema(struct Node* list){
 
+    // Pide datos al usuario
     int *date = malloc(sizeof(int));
     char *message = (char*)malloc(sizeof(char)*100);
     char *encryption = (char*)malloc(sizeof(char)*100);
@@ -54,26 +55,64 @@ struct Node* newSchema(struct Node* list){
 
     printf("DATE: %i\nMESSAGE: %s\nENCRYPTION: %s\n", date, message, encryption);
     
+    // Inicializa nuevo nodo
     struct Node* newNode; 
 
     if(list->date == 0){
+        printf("Primer Elemento\n");
         newNode = list;
     }else {
+        printf("Segundo Elemento\n"); 
         newNode = malloc(sizeof(struct Node));
     }
 
     newNode->date = date;
-    
 
     printf("DATE: %i\n", newNode->date);
 
     int len = strlen(message);
     printf("MESSAGE LENGTH: %i\n", len);
 
-    for(int x = 0; x < len; x += 1){
+    for(int x = 0; x < len; x++){
+        for(int y = 0; y < 67; y++){
+            if(message[x] == newNode->letters[y]){
+                y = 67;
+            }else if(newNode->letters[y] == '\0'){
+                printf("ASIGN LETTER %c in position %i\n", message[x], y);
+                newNode->letters[y] = message[x];
+                newNode->encryption[y] = encryption[y];
+                y = 67;
+            }
+        }
         printf("MESSAGE[%i]: %c\n", x, message[x]);
     }
+
+    for(int x = 0; x < 5; x++){
+        printf("LETTERS[%i]: %c\n", x, newNode->letters[x]);
+        printf("ENCRYPTION[%i]: %c\n", x, newNode->encryption[x]);
+    }
+    
+    if(newNode->date != list->date){
+        printf("Inserta Nodo\n");
+        struct Node* current = list;
+        while(current->date < newNode->date && current->next != NULL){
+            current = current->next;
+        }
+
+        insertAfterNode(newNode, current);
+    }
+
     return list;
+}
+
+char* getMessageLetters(char str[]){
+
+    int len = strlen(str);
+    int index = 0;
+
+    
+
+
 }
 
 // Inserts a new node into the list
@@ -81,6 +120,13 @@ void insertAfterNode(struct Node *node, struct Node *position){
     node->next = position->next;
     position->next = node;
     node->prev = position; 
+    return;
+}
+
+void insertBeforeNode(struct Node *node, struct Node *position){
+    node->prev = position->prev;
+    position->prev = node;
+    node->next = position;
     return;
 }
 
@@ -117,8 +163,12 @@ int main(){
         printf("\nHas Elegido Opcion: %i\n", opcion);
         if ( opcion==1 ) {
             listHead = newSchema(listHead);
+            printf("NEXT DE CABEZA: %p\n", listHead->next);
+            printf("DATE DE CABEZA: %i\n", listHead->date);
+
         // } else if ( opcion==2 ) {
-        //     descifrar();
+            // descifrar();
+            // printf("DATE DE CABEZA: %i\n", listHead->date);
         // } else if ( opcion==3 ) {
         //     cifrar();
         // } else if ( opcion==4 ) {
