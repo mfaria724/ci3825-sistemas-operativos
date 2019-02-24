@@ -130,12 +130,89 @@ void insertBeforeNode(struct Node *node, struct Node *position){
     return;
 }
 
-int descifrar(){
-    printf("\nDescifrar\n");
+int descifrar(struct Node* current){
+    char message[67];
+    int date;
+
+
+    printf("\nIngrese la fecha (YYYYMMDD): ");
+    scanf("%d", &date);
+    printf("\nIngrese mensaje cifrado: ");
+    scanf("%s", message);
+    int len = strlen(message);
+
+
+    if (date < current->date) {
+        printf("No existe ningun esquema anterior al mensaje\n");
+        return 0;
+    }
+    
+
+    while(current->next != NULL && date >= current->next->date){
+        current = current->next;
+    }
+
+    printf("Se esta usando %i",current->date);
+
+    int lenSchema = strlen(current->encryption);
+
+    int cambio;
+    for(int i = 0; i < len; i++)
+    {
+        cambio = 0;
+        for(int j = 0; j < lenSchema; j++)
+        {
+            if (message[i] == current->encryption[j]) {
+                message[i] = current->letters[j];
+                cambio = 1;
+            }
+        }
+        if (!cambio) {
+            message[i]= '#';
+        }
+    }
+    printf("\n%s\n", message);
 }
 
-int cifrar(){
-    printf("\nCifrar\n");
+int cifrar(struct Node* current){
+    char message[67];
+    int date;
+
+
+    printf("\nIngrese la fecha (YYYYMMDD) \n");
+    scanf("%d", &date);
+    printf("\nIngrese mensaje a cifrar:\n");
+    scanf("%s", message);
+    int len = strlen(message);
+
+
+    if (date < current->date) {
+        printf("No existe ningun esquema anterior al mensaje\n");
+        return 0;
+    }
+
+    while(current->next != NULL && date >= current->next->date){
+        current = current->next;
+    }
+
+    int lenSchema = strlen(current->encryption);
+
+    int cambio;
+    for(int i = 0; i < len; i++)
+    {
+        cambio = 0;
+        for(int j = 0; j < lenSchema; j++)
+        {
+            if (message[i] == current->letters[j]) {
+                message[i] = current->encryption[j];
+                cambio = 1;
+            }
+        }
+        if (!cambio) {
+            message[i]= '#';
+        }
+    }
+    printf("\n%s\n", message);
 }
 
 // int mostrar(tLista l){          //NO ESTA IMPLEMENTANDO, UNICAMENTE PARA VERIFICAR EL BUEN MAPEO DE LA LISTA
@@ -166,11 +243,11 @@ int main(){
             printf("NEXT DE CABEZA: %p\n", listHead->next);
             printf("DATE DE CABEZA: %i\n", listHead->date);
 
-        // } else if ( opcion==2 ) {
-            // descifrar();
+        } else if ( opcion==2 ) {
+            descifrar(listHead);
             // printf("DATE DE CABEZA: %i\n", listHead->date);
-        // } else if ( opcion==3 ) {
-        //     cifrar();
+        } else if ( opcion==3 ) {
+            cifrar(listHead);
         // } else if ( opcion==4 ) {
         //     mostrar(l);     // NO ESTA IMPLEMENTADO UNICAMENTE PARA TESTEAR EL BUEN MAPEO DE LA LISTA
         // } else if ( opcion==5 ) {
