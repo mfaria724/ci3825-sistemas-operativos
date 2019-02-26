@@ -325,7 +325,7 @@ struct Node* newSchema(struct Node* list){
         newNode = malloc(sizeof(struct Node));
     }
 
-    newNode->date = date;
+    newNode->date = *date;
 
     printf("DATE: %i\n", newNode->date);
 
