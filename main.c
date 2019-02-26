@@ -508,7 +508,15 @@ int borrar(struct Node* current){
         current = current->next;
     }
 
-    if(date == current->date){
+    if(date == current->date && current->next == NULL && current->prev == NULL){
+        free(current);
+    } else if(date == current->date && current->next == NULL){
+        current->prev->next = NULL;
+        free(current);
+    } else if(date == current->date && current->prev == NULL){
+        current->next->prev = NULL;
+        free(current);
+    } else if(date == current->date){
         current->prev->next = current->next;
         current->next->prev = current->prev;
         free(current);
