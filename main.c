@@ -445,16 +445,38 @@ int cifrar(struct Node* current){
     printf("\n%s\n", message);
 }
 
-// int mostrar(tLista l){          //NO ESTA IMPLEMENTANDO, UNICAMENTE PARA VERIFICAR EL BUEN MAPEO DE LA LISTA
-//     int elementobuscar;
-//     printf("\nMostrar\n");
-//     printf("ingrese fecha: ");     // PON CUALQUIER VALOR RANDOM
-//     scanf("%d", &elementobuscar);
-//     printf("Fecha del nodo: %d\n",elemento(posicion(elementobuscar,l),l));
-// }
+int mostrar(struct Node* current){          //NO ESTA IMPLEMENTANDO, UNICAMENTE PARA VERIFICAR EL BUEN MAPEO DE LA LISTA
+    int date;
+    printf("\nIngrese fecha: ");     // PON CUALQUIER VALOR RANDOM
+    scanf("%d", &date);
 
-int borrar(){
-    printf("Borrar");
+    while(current->next != NULL && date >= current->next->date){
+        current = current->next;
+    }
+
+    if(date == current->date){
+        printf("\nFecha: %i\nCifrado: %s\nDescifrado: %s\n\n", current->date, current->encryption, current->letters);
+    } else {
+        printf("No existe ningun esquema con la fecha ingresada");
+    }
+}
+
+int borrar(struct Node* current){
+    int date;
+    printf("\nIngrese fecha: ");     // PON CUALQUIER VALOR RANDOM
+    scanf("%d", &date);
+
+    while(current->next != NULL && date >= current->next->date){
+        current = current->next;
+    }
+
+    if(date == current->date){
+        current->prev->next = current->next;
+        current->next->prev = current->prev;
+        free(current);
+    } else {
+        printf("\nNo existe ningun esquema con la fecha ingresada\n");
+    }
 }
 
 /* Main: Menu principal - Display para elegir una de las funciones del programa*/
@@ -465,7 +487,7 @@ int main(){
 
     // Mientras opcion sea <0 o >6 permanecer en el loop;
     while (1){ 
-        printf("Introduzca una opcion valida: \n(1) Registro \n(2) Decifrar Mensaje \n(3) Cifrar Mensajes \n(4) Mostrar Cifrados Disponibles \n(5) Borrar Cifrado \n(0) Salir\nOpcion: ");
+        printf("Introduzca una opcion valida: \n(1) Registro \n(2) Decifrar Mensaje \n(3) Cifrar Mensajes \n(4) Mostrar Cifrado\n(5) Borrar Cifrado \n(0) Salir\nOpcion: ");
         scanf("%d", &opcion);
         printf("\nHas Elegido Opcion: %i\n", opcion);
         if ( opcion==1 ) {
@@ -478,10 +500,10 @@ int main(){
             // printf("DATE DE CABEZA: %i\n", listHead->date);
         } else if ( opcion==3 ) {
             cifrar(listHead);
-        // } else if ( opcion==4 ) {
-        //     mostrar(l);     // NO ESTA IMPLEMENTADO UNICAMENTE PARA TESTEAR EL BUEN MAPEO DE LA LISTA
-        // } else if ( opcion==5 ) {
-        //     borrar();
+        } else if ( opcion==4 ) {
+            mostrar(listHead);     // NO ESTA IMPLEMENTADO UNICAMENTE PARA TESTEAR EL BUEN MAPEO DE LA LISTA
+        } else if ( opcion==5 ) {
+            borrar(listHead);
         } else if ( opcion==0 ) {
             break;
         }
