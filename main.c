@@ -3,7 +3,11 @@
 #include <string.h>
 #include "main.h"
 
-/* Funciones del programa:
+/* Jesus Kauze 12-10273
+   Manuel Faria 15-10463
+   Juan Oropeza 15-11041
+
+   Funciones del programa:
         -Registro Nuevos Mensajes: Requiere mensaje cifrado y su descifrado
         -Descifrar Mensaje: Requiere escoger cifrado, requiere INPUT mensaje y fecha
         -Cifrar Mensaje: require INPUT mensaje
@@ -88,18 +92,13 @@ void comparisonSchema(struct Node *node, struct Node *posicion){
         if ( option == 1 ) {
             if (len_current > len_prev){
                 int counter = len_prev;
-                printf("\nel nodo actual tiene MAS caracteres que el previo.\n");
                 for(int i = 0; i < len_current; i++){
-                    // printf("-|[%i]:%c|-", i,node->encryption[i]);
                     for(int j = 0; j < len_prev; j++){
-                        // printf("[%i]%c", j,node->prev->encryption[j]);
                         if (node->encryption[i] == node->prev->encryption[j]){
                             j = len_prev;
                         } else {
                             if ( j == len_prev - 1){
-                                printf("\nen el PREVIO falta: <%c> - ", node->encryption[i]);
                                 node->prev->encryption[counter]=node->encryption[i];
-                                printf("En el previo se agrego <%c> en la posicion [%i]",node->prev->encryption[counter], counter);
                                 node->prev->letters[counter]=node->letters[i];
                                 counter++;
                             }
@@ -107,19 +106,15 @@ void comparisonSchema(struct Node *node, struct Node *posicion){
                     }
                 }
             node->prev->next=node->next;
-            printf("\n este es el resultado de la union de cifrados: <%s>  y de la union de letters: <%s> en el nodo con fecha <%d>\n", node->prev->encryption, node->prev->letters, node->prev->date);            
             } else {
                 int counter = len_current;
-                printf("\nel nodo actual tiene MENOS caracteres que el previo.\n");
                 for(int i = 0; i < len_prev; i++){
                     for(int j = 0; j < len_current; j++){
                         if (node->encryption[j] == node->prev->encryption[i]){
                             j = len_current;
                         } else {
                             if ( j == len_current - 1){
-                                printf("\nen el ACTUAL falta: <%c> - ", node->prev->encryption[i]);
                                 node->encryption[counter]=node->prev->encryption[i];
-                                printf("En el ACTUAL se agrego <%c> en la posicion [%i]",node->encryption[counter], counter);
                                 node->letters[counter]=node->prev->letters[i];
                                 counter++;
                             }
@@ -132,7 +127,6 @@ void comparisonSchema(struct Node *node, struct Node *posicion){
                 } else {
                     node->prev = posicion;
                 }
-                printf("\n este es el resultado de la union de cifrados: <%s>  y de la union de letters: <%s> en el nodo con fecha <%d>\n", node->encryption, node->letters, node->date);                
             }
             yet = 0; //to make only one UNION of dates.
         } else { // option == 2
@@ -190,7 +184,6 @@ void comparisonSchema(struct Node *node, struct Node *posicion){
         if ( option == 1 ) {
             if (len_current < len_next){
                 int counter = len_current;
-                printf("\nel nodo SIGUIENTE tiene MAS caracteres que el actual.\n");
                 for(int i = 0; i < len_next; i++){
                     // printf("-|[%i]:%c|-", i,node->next->encryption[i]);
                     for(int j = 0; j < len_current; j++){
@@ -198,9 +191,7 @@ void comparisonSchema(struct Node *node, struct Node *posicion){
                             j = len_current;
                         } else {
                             if ( j == len_current - 1){
-                                printf("\nen el ACTUAL falta el caracter: <%c> del schema cifrado - \n", node->next->encryption[i]);
                                 node->encryption[counter]=node->encryption[i];
-                                printf("en el ACTUAL se agrego <%c> en la posicion [%i] (en esquema de cifrado)",node->encryption[counter], counter);
                                 node->letters[counter]=node->letters[i];
                                 counter++;
                             }
@@ -208,8 +199,6 @@ void comparisonSchema(struct Node *node, struct Node *posicion){
                     }
                 }
             
-            printf("\n este es el resultado de la union en el nodo actual: <%s> y de la union de letters: <%s> en el nodo con fecha <%d>\n", node->encryption, node->letters, node->date);
-            node->date = node->next->date;
             if (node->next->next != NULL){
                 node->next=node->next->next;
             } else {
@@ -218,16 +207,13 @@ void comparisonSchema(struct Node *node, struct Node *posicion){
 
             } else {
                 int counter = len_next;
-                printf("\nel nodo actual tiene MAS caracteres que el siguiente.\n");
                 for(int i = 0; i < len_current; i++){
                     for(int j = 0; j < len_next; j++){
                         if (node->encryption[i] == node->next->encryption[j]){
                             j = len_next;
                         } else {
                             if ( j == len_next - 1){
-                                printf("\nen el SIGUIENTE falta: <%c> - ", node->encryption[i]);
                                 node->next->encryption[counter]=node->encryption[i];
-                                printf("En el SIGUIENTE se agrego <%c> en la posicion [%i]",node->next->encryption[counter], counter);
                                 node->next->letters[counter]=node->letters[i];
                                 counter++;
                             }
@@ -239,7 +225,6 @@ void comparisonSchema(struct Node *node, struct Node *posicion){
                 } else {
                     node->next->prev = posicion;
                 }
-                printf("\n este es el resultado de la union de cifrados: <%s>  y de la union de letters: <%s> en el nodo con fecha <%d>\n", node->next->encryption, node->next->letters, node->next->date);                
             }
         }
     }
@@ -279,7 +264,7 @@ void insertBeforeNode(struct Node *node, struct Node *position){
 struct Node* newSchema(struct Node* list){
 
     // Pide datos al usuario
-    int *date = malloc(sizeof(int));
+    int date = 0;
     char *message = (char*)malloc(sizeof(char)*100);
     char *encryption = (char*)malloc(sizeof(char)*100);
 
@@ -296,43 +281,34 @@ struct Node* newSchema(struct Node* list){
     fgets(encryption, 100, stdin);
     strtok(encryption, "\n");
 
-    printf("DATE: %i\nMESSAGE: %s\nENCRYPTION: %s\n", date, message, encryption);
     
     // Inicializa nuevo nodo
     struct Node* newNode; 
 
     if(list->date == 0){
-        printf("Primer Elemento\n");
         newNode = list;
     }else {
-        printf("Segundo Elemento\n"); 
         newNode = malloc(sizeof(struct Node));
     }
 
-    newNode->date = *date;
+    newNode->date = date;
 
-    printf("DATE: %i\n", newNode->date);
 
     int len = strlen(message);
-    printf("MESSAGE LENGTH: %i\n", len);
 
     for(int x = 0; x < len; x++){
         for(int y = 0; y < 67; y++){
             if(message[x] == newNode->letters[y]){
                 y = 67;
             }else if(newNode->letters[y] == '\0'){
-                printf("ASIGN LETTER %c in position %i\n", message[x], y);
                 newNode->letters[y] = message[x];
                 newNode->encryption[y] = encryption[x];
                 y = 67;
             }
         }
-        printf("MESSAGE[%i]: %c\n", x, message[x]);
     }
 
     for(int x = 0; x < 5; x++){
-        printf("LETTERS[%i]: %c\n", x, newNode->letters[x]);
-        printf("ENCRYPTION[%i]: %c\n", x, newNode->encryption[x]);
     }
     
     if(newNode->date != list->date){
@@ -350,7 +326,7 @@ struct Node* newSchema(struct Node* list){
         insertAfterNode(newNode, current);
     }
 
-
+    printf("\nSe ha registrado el esquema correctamente\n");
     return list;
 }
 
@@ -483,16 +459,20 @@ int borrar(struct Node* current){
 
     if(date == current->date && current->next == NULL && current->prev == NULL){
         free(current);
+        printf("Esquema eliminado");
     } else if(date == current->date && current->next == NULL){
         current->prev->next = NULL;
         free(current);
+        printf("Esquema eliminado");
     } else if(date == current->date && current->prev == NULL){
         current->next->prev = NULL;
         free(current);
+        printf("Esquema eliminado");
     } else if(date == current->date){
         current->prev->next = current->next;
         current->next->prev = current->prev;
         free(current);
+        printf("Esquema eliminado");
     } else {
         printf("\nNo existe ningun esquema con la fecha ingresada\n");
     }
@@ -511,8 +491,6 @@ int main(){
         printf("\nHas Elegido Opcion: %i\n", opcion);
         if ( opcion==1 ) {
             listHead = newSchema(listHead);
-            printf("NEXT DE CABEZA: %p\n", listHead->next);
-            printf("DATE DE CABEZA: %i\n", listHead->date);
 
         } else if ( opcion==2 ) {
             descifrar(listHead);
