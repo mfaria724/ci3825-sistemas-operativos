@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "main.h"
 
 /* Funciones del programa:
         -Registro Nuevos Mensajes: Requiere mensaje cifrado y su descifrado
@@ -21,23 +22,6 @@ struct Node{
     struct Node* prev;
 };
 
-// Error handling
-static void error(char *cad)
-{
-   fprintf(stderr, "ERROR: %s\n", cad);
-   exit(1);
-}
-
-// Initialize list with a single node
-struct Node *createList(){
-    struct Node *l = malloc(sizeof(struct Node));          //Asigna espacio que requiere l para tiponodo
-    if (l == NULL){
-        error("Memoria insuficiente");
-        exit(1);
-    }
-    l->next = l->prev = NULL;         
-    return l;
-}
 
 void comparisonSchema(struct Node *node, struct Node *posicion){
     int samescheme = 0;
@@ -370,15 +354,6 @@ struct Node* newSchema(struct Node* list){
     return list;
 }
 
-char* getMessageLetters(char str[]){
-
-    int len = strlen(str);
-    int index = 0;
-
-    
-
-
-}
 
 int descifrar(struct Node* current){
     char message[67];
@@ -393,7 +368,7 @@ int descifrar(struct Node* current){
 
 
     if (date < current->date) {
-        printf("No existe ningun esquema anterior al mensaje\n");
+        printf("\nNo existe ningun esquema anterior al mensaje\n");
         return 0;
     }
     
@@ -401,8 +376,6 @@ int descifrar(struct Node* current){
     while(current->next != NULL && date >= current->next->date){
         current = current->next;
     }
-
-    printf("Se esta usando %i",current->date);
 
     int lenSchema = strlen(current->encryption);
 
@@ -437,7 +410,7 @@ int cifrar(struct Node* current){
 
 
     if (date < current->date) {
-        printf("No existe ningun esquema anterior al mensaje\n");
+        printf("\nNo existe ningun esquema anterior al mensaje\n");
         return 0;
     }
 
@@ -543,13 +516,12 @@ int main(){
 
         } else if ( opcion==2 ) {
             descifrar(listHead);
-            // printf("DATE DE CABEZA: %i\n", listHead->date);
         } else if ( opcion==3 ) {
             cifrar(listHead);
         } else if ( opcion==6 ){
             printList(listHead);
         } else if ( opcion==4 ) {
-            mostrar(listHead);     // NO ESTA IMPLEMENTADO UNICAMENTE PARA TESTEAR EL BUEN MAPEO DE LA LISTA
+            mostrar(listHead);
         } else if ( opcion==5 ) {
             borrar(listHead);
         } else if ( opcion==0 ) {
