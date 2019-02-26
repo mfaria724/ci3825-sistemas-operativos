@@ -58,14 +58,16 @@ void comparisonSchema(struct Node *node, struct Node *posicion){
         int higher = len_current;
         int lower = len_prev;
         for (int i = 0; i < lower; i++ ){
+            
+            samescheme = 0;
+            
             for (int j = 0; j < higher; j++){
-                samescheme = 0;
                 if ( node->encryption[j] == node->prev->encryption[i] && node->letters[j] == node->prev->letters[i] ){
                     samescheme = 1;
-                } else if ( node->encryption[j] != node->prev->encryption[i] && node->letters[j] != node->prev->letters[i]){
-                    samescheme = 1;
+                    break;
                 }
             }
+
             if ( samescheme == 0 ){
                 break;
             }
@@ -74,21 +76,16 @@ void comparisonSchema(struct Node *node, struct Node *posicion){
         int higher = len_prev;
         int lower = len_current;
         for (int i = 0; i < lower; i++ ){
+
+            samescheme = 0;
+            
             for (int j = 0; j < higher; j++){
-                samescheme = 0;
                 if ( node->encryption[i] == node->prev->encryption[j] && node->letters[i] == node->prev->letters[j] ){
                     samescheme = 1;
-                } else if ( node->encryption[i] != node->prev->encryption[j] && node->letters[i] != node->prev->letters[j]){
-                    samescheme = 1;                    
-                    for(int x = 0; x < higher; x++)
-                    {
-                        if ( node->letters[i] == node->prev->letters[x] ){
-                            samescheme = 0;
-                        }
-                    }
-                    
-                }
+                    break;
+                } 
             }
+
             if ( samescheme == 0 ){
                 break;
             }
@@ -98,7 +95,7 @@ void comparisonSchema(struct Node *node, struct Node *posicion){
     if (samescheme){
         int option = 0;
         while ( 1 ) {
-            printf("\nTienes esquemas de cifrado iguales con la fecha <%i> previa: (1)Unir cifrados (2)Crear nuevo : ", node->prev->date);
+            printf("\nTienes esquemas de cifrado iguales con la fecha <%i> previa: \n(1) Unir cifrados \n(2) Crear nuevo \nSelecciona una opcion: ", node->prev->date);
             scanf("%d", &option);
             if (option == 1 || option == 2){
                 break;
@@ -163,14 +160,16 @@ void comparisonSchema(struct Node *node, struct Node *posicion){
         int higher = len_current;
         int lower = len_next;
         for (int i = 0; i < lower; i++ ){
+
             samescheme = 0;
+            
             for (int j = 0; j < higher; j++){
                 if ( node->encryption[j] == node->next->encryption[i] && node->letters[j] == node->next->letters[i] ){
                     samescheme = 1;
-                } else if ( node->encryption[j] != node->next->encryption[i] && node->letters[j] != node->next->letters[i]){
-                    samescheme = 1;
-                }
+                    break;
+                } 
             }
+
             if ( samescheme == 0 ){
                 break;
             }
@@ -180,20 +179,15 @@ void comparisonSchema(struct Node *node, struct Node *posicion){
         int higher = len_next;
         int lower = len_current;
         for (int i = 0; i < lower; i++ ){
+
             samescheme = 0;
+            
             for (int j = 0; j < higher; j++){
                 if ( node->encryption[i] == node->next->encryption[j] && node->letters[i] == node->next->letters[j] ){
                     samescheme = 1;
-                } else if ( node->encryption[i] != node->next->encryption[j] && node->letters[i] != node->next->letters[j]){
-                    samescheme = 1;
-                    for(int x = 0; x < higher; x++)
-                    {
-                        if ( node->letters[i] == node->next->letters[x] ){
-                            samescheme = 0;
-                        }
-                    }
-                }
+                } 
             }
+
             if ( samescheme == 0 ){
                 break;
             }
@@ -203,7 +197,7 @@ void comparisonSchema(struct Node *node, struct Node *posicion){
     if (samescheme && yet){
         int option = 0;
         while ( 1 ) {
-            printf("\nTienes esquemas de cifrado iguales con la siguiente fecha <%i> elige: (1)Unir cifrados (2)Crear nuevo : ", node->next->date);
+            printf("\nTienes esquemas de cifrado iguales con la siguiente fecha <%i> elige: \n(1) Unir cifrados \n(2) Crear nuevo\n Selecciona una opcion: ", node->next->date);
             scanf("%d", &option);
             if (option == 1 || option == 2){
                 break;
@@ -270,9 +264,16 @@ void comparisonSchema(struct Node *node, struct Node *posicion){
 
 // Inserts a new node into the list
 void insertAfterNode(struct Node *node, struct Node *position){
+
     node->next = position->next;
     position->next = node;
+    
+    if(node->next != NULL){
+        node->next->prev = node;
+    }
+
     node->prev = position; 
+
     comparisonSchema(node,position);
     return;
 }
@@ -280,7 +281,14 @@ void insertAfterNode(struct Node *node, struct Node *position){
 void insertBeforeNode(struct Node *node, struct Node *position){
     node->prev = position->prev;
     position->prev = node;
+
+    if (node->prev != NULL){
+        node->prev->next = node;
+    }
+    
     node->next = position;
+
+    comparisonSchema(node, position);
     return;
 }
 
@@ -338,14 +346,20 @@ struct Node* newSchema(struct Node* list){
     }
     
     if(newNode->date != list->date){
-        printf("Inserta Nodo\n");
-        struct Node* current = list;
-        while(current->date < newNode->date && current->next != NULL){
+        struct Node* current = malloc(sizeof(struct Node));
+        current = list;
+
+        while(current->next != NULL && current->date < newNode->date){
             current = current->next;
         }
 
+        if(current->prev != NULL){
+            current = current->prev;
+        }
+        
         insertAfterNode(newNode, current);
     }
+
 
     return list;
 }
@@ -445,6 +459,24 @@ int cifrar(struct Node* current){
     printf("\n%s\n", message);
 }
 
+void printList(struct Node* listHead){
+
+    int counter = 0;
+
+    while(listHead != NULL){
+        printf("\n##### NODO #%i #####\n", counter);
+        printf("DATE: %i - PREV %p - NEXT: %p\n", listHead->date, listHead->prev, listHead->next);
+        printf("LETTERS: \n");
+        int len = strlen(listHead->letters);
+        for(int x = 0; x < len; x++){
+            printf("LETTERS[%i]: %c\n", x, listHead->letters[x]);
+            printf("ENCRYPTION[%i]: %c\n", x, listHead->encryption[x]);
+        }
+        listHead = listHead->next;
+        counter++;
+    }
+}
+
 // int mostrar(tLista l){          //NO ESTA IMPLEMENTANDO, UNICAMENTE PARA VERIFICAR EL BUEN MAPEO DE LA LISTA
 //     int elementobuscar;
 //     printf("\nMostrar\n");
@@ -482,6 +514,8 @@ int main(){
         //     mostrar(l);     // NO ESTA IMPLEMENTADO UNICAMENTE PARA TESTEAR EL BUEN MAPEO DE LA LISTA
         // } else if ( opcion==5 ) {
         //     borrar();
+        } else if ( opcion==6 ){
+            printList(listHead);
         } else if ( opcion==0 ) {
             break;
         }
