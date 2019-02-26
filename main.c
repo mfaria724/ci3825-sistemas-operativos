@@ -285,10 +285,16 @@ struct Node* newSchema(struct Node* list){
 
     printf("Ingrese la fecha (YYYYMMDD): ");
     scanf("%i", &date);
+
+    fflush(stdin);
     printf("Ingrese el mensaje sin decifrar: ");
-    scanf("%s", message);
+    fgets(message, 2, stdin);
+    fgets(message, 100, stdin);
+    strtok(message, "\n");
+
     printf("Ingrese el mensaje cifrado: ");
-    scanf("%s", encryption);
+    fgets(encryption, 100, stdin);
+    strtok(encryption, "\n");
 
     printf("DATE: %i\nMESSAGE: %s\nENCRYPTION: %s\n", date, message, encryption);
     
@@ -317,7 +323,7 @@ struct Node* newSchema(struct Node* list){
             }else if(newNode->letters[y] == '\0'){
                 printf("ASIGN LETTER %c in position %i\n", message[x], y);
                 newNode->letters[y] = message[x];
-                newNode->encryption[y] = encryption[y];
+                newNode->encryption[y] = encryption[x];
                 y = 67;
             }
         }
