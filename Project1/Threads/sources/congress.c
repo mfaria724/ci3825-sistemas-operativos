@@ -23,7 +23,7 @@ void *congress (void* filename) {
 
   // Checks that file could be opened
   if (fp == NULL) {
-    printf("No se pudo abrir el archivo %s. Verifique que la ruta al archivo sea correcta.\n", filename);
+    printf("No se pudo abrir el archivo %s. Verifique que la ruta al archivo sea correcta.\n", (char *)filename);
     return NULL;
   }
 
