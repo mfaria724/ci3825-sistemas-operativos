@@ -1,7 +1,7 @@
 # Directory of processes files
 processes = $(wildcard Processes/sources/*.c)
 # Directory of threads files
-threads = $(wildcard Threads/*.c)
+threads = $(wildcard Threads/sources/*.c)
 
 # Main function
 main: 
