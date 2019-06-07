@@ -31,17 +31,26 @@ int main (int argc, char* argv[]) {
 
     int combination;  
 
+    FILE *out;
+
     //  Counts arguments that are options
     int lastFlag = 0;
     for(int z = 0; z < argc - 1; z++){
       if(argv[z][0] == '-' || argv[z][0] == '+')
         lastFlag += 1;
+      if(strcmp(">",argv[z]) == 0){
+          out = fopen(argv[argc - 1], "w+");
+          fclose(out);
+      } 
     }
 
     for(int z = lastFlag + 1; z <= argc - 1; z++){
 
       if(strcmp("<",argv[z]) == 0)
         z++;
+
+      if(strcmp(">",argv[z]) == 0)
+        break;
 
       if (stat(argv[z], &fileStat) < 0) {
         printf("Error getting stat for file %s\n", argv[z]);
@@ -71,7 +80,9 @@ int main (int argc, char* argv[]) {
 
       // Iterates over provided options
       for (int z = 1; z < argc-1 ; z++) {
+
         combination = strlen(argv[z]);
+
         // Asign bits
         if (argv[z][0] == '+' && combination > 2 ) {
           char* flags = argv[z];
@@ -92,7 +103,7 @@ int main (int argc, char* argv[]) {
               groupExec = 1;
               otherExec = 1;
             } else{
-              printf("Unrecognized operation -%s\n", argv[z][w]);
+              printf("Unrecognized operation -%c\n", argv[z][w]);
               return 1;
             }
           }
@@ -116,7 +127,7 @@ int main (int argc, char* argv[]) {
               groupExec = 0;
               otherExec = 0;
             } else{
-              printf("Unrecognized operation -%s\n", argv[z][w]);
+              printf("Unrecognized operation -%c\n", argv[z][w]);
               return 1;
             }
           }
@@ -154,7 +165,6 @@ int main (int argc, char* argv[]) {
           }
         }
       }
-
 
       // Create mode to save with chmod
       int user = userRead + userWrite + userExec;

@@ -17,7 +17,7 @@ void printFileProperties(struct stat stats, int G, int i, int h, int g, struct p
 {
     // [Inode]
         if (i = 1) {
-            printf("%-8d ", stats.st_ino);
+            printf("%-8zu ", stats.st_ino);
         }
     // [Type File]
     switch (stats.st_mode & S_IFMT) {
@@ -44,7 +44,7 @@ void printFileProperties(struct stat stats, int G, int i, int h, int g, struct p
 
     // [number of hard links] 
     // http://www.gnu.org/software/libc/manual/html_node/Attribute-Meanings.html
-    printf(" %d ", stats.st_nlink);
+    printf(" %zu ", stats.st_nlink);
 
     // [owner]
     // http://linux.die.net/man/3/getpwuid

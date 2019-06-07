@@ -17,28 +17,36 @@ void main(int argc, char *argv[]){
 
     // Reading flags
     for (int z = 1; z < argc-1 ; z++) {
+
       combination = strlen(argv[z]);
+
       if (argv[z][0] == '-' && combination > 2 ) {
+
         char* flags = argv[z];
         int len = strlen(flags);
+
         for (int w = 1; w < len ; w++){
+
           char letter = flags[w];
+
           if (letter == 'i') {
             options[0] = 1;
           } else if (letter == 'v') {
             options[1] = 1;
           } else {
-            printf("Unrecognized operation -%s\n",argv[z][w]);
+            printf("Unrecognized operation -%c\n",argv[z][w]);
             return;
           }
        }
-
       } else { 
         if (strcmp("-i", argv[z]) == 0) {
           options[0] = 1;
+
         } else if (strcmp("-v", argv[z]) == 0) {
           options[1] = 1;
+
         } else {
+
           if(argv[z][0] == '-'){
             printf("Unrecognized operation %s\n",argv[z]);
             return;
@@ -52,10 +60,9 @@ void main(int argc, char *argv[]){
 
       while(fgets(temp,1000,stdin)){
 
-        if(strcmp(temp,"EndOfPipe\n") == 0){
+        if(strcmp(temp,"EndOfPipe\n") == 0)
           break;
-        }
-
+        
         if(options[1]){
           if(options[0]){
             if(!strcasestr(temp,argv[argc - 1]))
@@ -74,14 +81,17 @@ void main(int argc, char *argv[]){
           }
         }
       }
+
     // Case File    
     } else if(argv[argc - 2][0] != '-') {
         
       // Counts arguments that are flags
       int lastFlag = 0;
       for(int i = 0; i < argc - 1; i++){
+
         if(argv[i][0] == '-')
           lastFlag += 1;
+
         if(strcmp(">",argv[i]) == 0){
           options[2] = 1;
           out = fopen(argv[argc - 1], "w+");
@@ -94,6 +104,7 @@ void main(int argc, char *argv[]){
         // Jump to next iteration if has <
         if(strcmp("<",argv[i]) == 0)
           i++;
+          
         if(strcmp(">",argv[i]) == 0)
           break;
             
