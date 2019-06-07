@@ -17,7 +17,7 @@ void printFileProperties(struct stat stats, int G, int i, int h, int g, struct p
 {
     // [Inode]
     if (i == 1 && pollito_mayor == 0) {
-        printf("%-10zu ", stats.st_ino);
+        printf("%-10zu ", staDEBUGts.st_ino);
     } else if (i == 1 && pollito_mayor == 1) {
         char str[30];
         sprintf(str, "%zu ", stats.st_ino);
@@ -156,6 +156,7 @@ int main(int argc, char* argv[])
     FILE* out;
     int final = 0;
     int only_ls = 0;
+    char* base;
 
         //Defining Struct file for every file (called in loop)
         //Defining Struct Directory (contains the path)
@@ -214,12 +215,15 @@ int main(int argc, char* argv[])
         }
         // printf("valor: %d", c_re);
         thedirectory = opendir(argv[argc-c_re]);
+        base = argv[argc-c_re];
     } else {
         if (strcmp("~",argv[argc-1]) == 0) {
             final = 1;
             c_re++;
         }
         thedirectory = opendir(".");
+        base = "./";
+
     }
 
     // printf(":LA CARPETA ABRIO CORRECTO SI NO DA NULL:: %s \n",thedirectory);
@@ -252,6 +256,7 @@ int main(int argc, char* argv[])
                 // printf("-R\n");
             } else {
                 printf("Unrecognized3 operation\n");
+                printf("EndOfPipe\n");
                 // exit(0);
             }
         }
@@ -275,6 +280,7 @@ int main(int argc, char* argv[])
             // printf("-R\n");
         } else {
             printf("Unrecognized4 operation\n");
+            printf("EndOfPipe\n");
             exit(0);
         }
       }
@@ -299,6 +305,8 @@ int main(int argc, char* argv[])
             // Get current directory
             thedirectory = opendir(".");
             pwdc = 1;
+            base = "./";
+
             
             // Get Last Flag
             combination = strlen(current);
@@ -371,12 +379,21 @@ int main(int argc, char* argv[])
             last_directory = 1; 
             if (ptr[next] != NULL) {
                 // printf("\n./%s \n",arr[next]);
-                thedirectory = opendir(arr[next]);
                 // thedirectory = opendir(ptr[next]);
-                printf("\nproxima carpeta: %s\n",arr[next]);
+                char* var_dir = arr[next];
+                // printf("\nDEBUG ANTES %s base:%s  var_dir:%s\n", arr[0], base, var_dir);
+                // var_dir = ".vscode";
+                if (strcmp(base,".") == 0){
+                    base = "./";
+                    // printf("\nDEBUG ANTES %s base:%s  var_dir:%s\n", arr[0], base, var_dir);
+                }
+                strcat(base,var_dir);
+                // printf("DEBUG11 %s base: %s\n", arr[0], base);
+                // printf("BASE : %s", base);
+                printf("\n%s\n",base);
+                thedirectory = opendir(base);
                 // printf(":LA CARPETA ABRIO CORRECTO SI NO DA NULL:: %s \n",thedirectory);
                 thefile = readdir(thedirectory);
-                // printf("marico\n");
                 next++;
             } else {
                 break;
