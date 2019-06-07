@@ -29,26 +29,32 @@ int main (int argc, char* argv[]) {
     int otherWrite = 0;
     int otherExec = 0;
 
+    // Variable used to get options from flags
     int combination;  
 
+    // Initializes output file
     FILE *out;
 
-    //  Counts arguments that are options
+    //  Counts arguments that are options and verifies if the output will be redirectioned to a file
     int lastFlag = 0;
     for(int z = 0; z < argc - 1; z++){
       if(argv[z][0] == '-' || argv[z][0] == '+')
         lastFlag += 1;
+
       if(strcmp(">",argv[z]) == 0){
           out = fopen(argv[argc - 1], "w+");
           fclose(out);
       } 
     }
 
+    // Iterates over every file that will be changed its permissions
     for(int z = lastFlag + 1; z <= argc - 1; z++){
 
+      // Jump to next iteration if has <
       if(strcmp("<",argv[z]) == 0)
         z++;
 
+      // Checks when to finish the cycle if the output is going to be redirectioned 
       if(strcmp(">",argv[z]) == 0)
         break;
 
@@ -84,6 +90,8 @@ int main (int argc, char* argv[]) {
         combination = strlen(argv[z]);
 
         // Asign bits
+
+        // If the argument is a flag, and has more than one option, iterates over it to get every option on it
         if (argv[z][0] == '+' && combination > 2 ) {
           char* flags = argv[z];
           int len = strlen(flags);
@@ -107,7 +115,7 @@ int main (int argc, char* argv[]) {
               return 1;
             }
           }
-
+        // If the argument is a flag, and has more than one option, iterates over it to get every option on it
         } else if (argv[z][0] == '-' && combination > 2 ) {
           char* flags = argv[z];
           int len = strlen(flags);
@@ -131,7 +139,7 @@ int main (int argc, char* argv[]) {
               return 1;
             }
           }
-
+        // If has only one  option, checks which one is it
         } else { 
           if (strcmp("+r", argv[z]) == 0) {
             userRead = 4;
