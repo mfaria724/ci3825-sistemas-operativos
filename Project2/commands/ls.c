@@ -13,14 +13,21 @@ int human_read(int a){
     return a / 1000;
 }
 
-void printFileProperties(struct stat stats, int G, int i, int h, int g, struct passwd *tf, struct group *gf, char* namefile)
+void printFileProperties(struct stat stats, int G, int i, int h, int g, struct passwd *tf, struct group *gf, char* namefile, int pollito_mayor, FILE* out)
 {
     // [Inode]
-        if (i = 1) {
-            printf("%-8zu ", stats.st_ino);
-        }
-    // [Type File]
-    switch (stats.st_mode & S_IFMT) {
+    if (i == 1 && pollito_mayor == 0) {
+        printf("%-10zu ", stats.st_ino);
+    } else if (i == 1 && pollito_mayor == 1) {
+        char str[30];
+        sprintf(str, "%zu ", stats.st_ino);
+        fputs(str, out);
+    }
+
+    // [file type]
+    // http://manpagesfr.free.fr/man/man2/stat.2.html
+    if (pollito_mayor == 0) {
+        switch (stats.st_mode & S_IFMT) {
             case S_IFBLK:  printf("b"); break; //block device
             case S_IFCHR:  printf("c"); break; //caracter device
             case S_IFDIR:  printf("d"); break; //directory 
@@ -28,68 +35,140 @@ void printFileProperties(struct stat stats, int G, int i, int h, int g, struct p
             case S_IFLNK:  printf("l"); break; //Sym link
             case S_IFSOCK: printf("s"); break; //socket
             default:       printf("-"); break; //unasigned
+        }
+    } else {
+        switch (stats.st_mode & S_IFMT) {
+            case S_IFBLK:  fputs("b", out); break; //block device
+            case S_IFCHR:  fputs("c", out); break; //caracter device
+            case S_IFDIR:  fputs("d", out); break; //directory 
+            case S_IFIFO:  fputs("p", out); break; //fifo/pipe
+            case S_IFLNK:  fputs("l", out); break; //Sym link
+            case S_IFSOCK: fputs("s", out); break; //socket
+            default:       fputs("-", out); break; //unasigned
+        }
     }
-
     // [permissions]
     // http://linux.die.net/man/2/chmod 
-    printf( (stats.st_mode & S_IRUSR) ? "r" : "-"); //
-    printf( (stats.st_mode & S_IWUSR) ? "w" : "-"); // OWNER
-    printf( (stats.st_mode & S_IXUSR) ? "x" : "-"); //
-    printf( (stats.st_mode & S_IRGRP) ? "r" : "-");   // 
-    printf( (stats.st_mode & S_IWGRP) ? "w" : "-");   // GROUP
-    printf( (stats.st_mode & S_IXGRP) ? "x" : "-");   //
-    printf( (stats.st_mode & S_IROTH) ? "r" : "-");     // 
-    printf( (stats.st_mode & S_IWOTH) ? "w" : "-");     // OTHER
-    printf( (stats.st_mode & S_IXOTH) ? "x" : "-");     //
-
+    if (pollito_mayor == 0) {
+        printf( (stats.st_mode & S_IRUSR) ? "r" : "-"); //
+        printf( (stats.st_mode & S_IWUSR) ? "w" : "-"); // OWNER
+        printf( (stats.st_mode & S_IXUSR) ? "x" : "-"); //
+        printf( (stats.st_mode & S_IRGRP) ? "r" : "-");   // 
+        printf( (stats.st_mode & S_IWGRP) ? "w" : "-");   // GROUP
+        printf( (stats.st_mode & S_IXGRP) ? "x" : "-");   //
+        printf( (stats.st_mode & S_IROTH) ? "r" : "-");     // 
+        printf( (stats.st_mode & S_IWOTH) ? "w" : "-");     // OTHER
+        printf( (stats.st_mode & S_IXOTH) ? "x" : "-");     //
+    } else {
+        fputs( (stats.st_mode & S_IRUSR) ? "r" : "-", out); //
+        fputs( (stats.st_mode & S_IWUSR) ? "w" : "-", out); // OWNER
+        fputs( (stats.st_mode & S_IXUSR) ? "x" : "-", out); //
+        fputs( (stats.st_mode & S_IRGRP) ? "r" : "-", out);   // 
+        fputs( (stats.st_mode & S_IWGRP) ? "w" : "-", out);   // GROUP
+        fputs( (stats.st_mode & S_IXGRP) ? "x" : "-", out);   //
+        fputs( (stats.st_mode & S_IROTH) ? "r" : "-", out);     // 
+        fputs( (stats.st_mode & S_IWOTH) ? "w" : "-", out);     // OTHER
+        fputs( (stats.st_mode & S_IXOTH) ? "x" : "-", out);     //   
+    }
     // [number of hard links] 
     // http://www.gnu.org/software/libc/manual/html_node/Attribute-Meanings.html
-    printf(" %zu ", stats.st_nlink);
+    if (pollito_mayor == 0) {
+        printf(" %zu ", stats.st_nlink);
+    } else {
+        char str[30];
+        sprintf(str, " %zu ", stats.st_ino);
+        fputs(str, out);
+    }
 
     // [owner]
     // http://linux.die.net/man/3/getpwuid
-    if (G != 1) {
+    if (G != 1 && pollito_mayor == 0) {
         tf = getpwuid(stats.st_uid);
         printf("%s ", tf->pw_name);
+    } else if (G != 1 && pollito_mayor == 1) {
+        tf = getpwuid(stats.st_uid);
+        fputs(tf->pw_name,out);
+        fputs(" ",out);
     }
+    
     // [group]
     // http://linux.die.net/man/3/getgrgid
-    if (g != 1) {
+    if ( g != 1 && pollito_mayor == 0 ) {
         gf = getgrgid(stats.st_gid);
         printf("%s ", gf->gr_name);
+    } else if ( g != 1 && pollito_mayor == 1 ) {
+        gf = getgrgid(stats.st_gid);
+        fputs(gf->gr_name,out);
+        fputs(" ",out);
     }
 
     // [size in bytes/Kbytes/Mbytes] 
-    if (h != 1) {
+    if ( h != 1 && pollito_mayor == 0 ) {
         printf("%7zu ",stats.st_size); // BYTES,         
-    } else {
+    } else if ( h != 1 && pollito_mayor == 1 ) {
+        char str[30];
+        sprintf(str, "%zu ", stats.st_size);
+        fputs(str, out);
+    } else if ( h == 1 && pollito_mayor == 0 ) {
         if (human_read(stats.st_size) == 0) {
-            printf("%8zu ",stats.st_size);             // If MBYTE == 0 PRINT KBYTE
+            printf("%8zu ",stats.st_size);
         } else if (human_read(stats.st_size) < 800) {
             printf("%7dK ",human_read(stats.st_size)); // KBYTES,                                     
         } else {
             printf("%7dM ",human_read(stats.st_size)); // MBYTES,                     
         }
+    } else {
+        if (human_read(stats.st_size) == 0) {
+            char str[30];
+            sprintf(str, "%zu ", stats.st_size);
+            fputs(str, out);               
+        } else if (human_read(stats.st_size) < 800) {
+            char str[30];
+            sprintf(str, "%dK ", human_read(stats.st_size));
+            fputs(str, out);
+        } else {
+            char str[30];
+            sprintf(str, "%dM ", human_read(stats.st_size));
+            fputs(str, out);                   
+        }
     }
 
-    // [time of last modification] 
-    printf("%.12s ", ctime(&stats.st_mtime)+4);
+        // [time of last modification] 
+        if (pollito_mayor == 1) {
+            fprintf(out,"%.12s ",ctime(&stats.st_mtime)+4);
+        } else {
+            printf("%.12s ", ctime(&stats.st_mtime)+4);
+        } 
 
     // [filename]
-    printf("%s\n", namefile);
+    if (pollito_mayor == 1) {
+        fprintf(out,"%s\n ",namefile);
+    } else {
+        printf("%s\n", namefile);
+    }
+
+    // [filename]
+    // printf("%s\n", namefile);
 }
 
-int main(int argc, char* argv[])                                                          // MAIN
+int main(int argc, char* argv[])                                                    
 {
     FILE* out;
+    int final = 0;
     int only_ls = 0;
+
         //Defining Struct file for every file (called in loop)
         //Defining Struct Directory (contains the path)
-    if(argc < 2) {
+    if(argc == 2 && strcmp("~",argv[argc-1]) == 0) {
+        
         // printf("usage: ./ls [OPTION: -R, -G, -g, -i, -h, none]... [FILE]...\n");
         only_ls = 1;
+        final = 1;
         // exit(1);
+    } else if (argc < 2) {
+        only_ls = 1;
     }
+    
 
     DIR *thedirectory;
     struct dirent *thefile;
@@ -115,7 +194,6 @@ int main(int argc, char* argv[])                                                
     int pollito_mayor = 0;
     int pwdc = 0;
     int c_re = 1;
-    int final = 0;
 
         // Open the directory / File (only_ls == 1 is to ./ls only)
     if (only_ls == 0) {
@@ -124,7 +202,6 @@ int main(int argc, char* argv[])                                                
                 out = fopen(argv[argc-1],"w+");
                 pollito_mayor = 1;
                 c_re = 3;
-                printf(" ENCONTRADO\n");
                 break;
             } else {
                 c_re = 1;
@@ -138,6 +215,10 @@ int main(int argc, char* argv[])                                                
         // printf("valor: %d", c_re);
         thedirectory = opendir(argv[argc-c_re]);
     } else {
+        if (strcmp("~",argv[argc-1]) == 0) {
+            final = 1;
+            c_re++;
+        }
         thedirectory = opendir(".");
     }
 
@@ -146,7 +227,9 @@ int main(int argc, char* argv[])                                                
         // Reading the flags
     for (int z = 1; z < argc-c_re ; z++) {
       combination = strlen(argv[z]);
-      if (  combination > 2 ) {
+      char* actual = argv[z];
+      char sig = actual[0];
+      if (  combination > 2 && sig == '-') {
         char* flags = argv[z];
         int len = strlen(flags);
         for (int w = 1; w < len ; w++){
@@ -168,12 +251,12 @@ int main(int argc, char* argv[])                                                
                 R2 = 1;
                 // printf("-R\n");
             } else {
-                printf("Unrecognized operation\n");
+                printf("Unrecognized3 operation\n");
                 // exit(0);
             }
         }
 
-      } else { 
+      } else if( sig == '-') { 
         if (strcmp("-G", argv[z]) == 0) {
             G = 1;
             // printf("-G\n");
@@ -191,22 +274,25 @@ int main(int argc, char* argv[])                                                
             R2 = 1;
             // printf("-R\n");
         } else {
-            printf("Unrecognized operation\n");
+            printf("Unrecognized4 operation\n");
             exit(0);
         }
       }
     }
         // its a FIle NOT directory (or current directory)
     if ( thedirectory == NULL ) {
-        char* current = argv[argc-1];
-        char letter = current[0];
         int y = c_re;
+        char* current = argv[argc-y];
+        char letter = current[0];
         // If last parameters is not a flag
         
         if (stat(argv[argc-c_re], &thestat) == 0) {
             while (stat(argv[argc-y], &thestat) == 0) {
-                printFileProperties(thestat, G, i, h, g, tf, gf, argv[argc-y]);
+                printFileProperties(thestat, G, i, h, g, tf, gf, argv[argc-y], pollito_mayor, out);
                 y++;
+            }
+            if (final) {
+                printf("EndOfPipe\n");
             }
             return 0;
         } else if (letter == '-') {
@@ -238,6 +324,7 @@ int main(int argc, char* argv[])                                                
                         // printf("-R\n");
                     } else {
                         printf("Unrecognized operation\n");
+                        printf("EndOfPipe\n");
                         exit(0);
                     }
                 }
@@ -261,6 +348,7 @@ int main(int argc, char* argv[])                                                
                     // printf("-R\n");
                 } else {
                     printf("Unrcognized operation\n");
+                    printf("EndOfPipe\n");
                     exit(0);
                 }
             }
@@ -286,7 +374,7 @@ int main(int argc, char* argv[])                                                
                 thedirectory = opendir(arr[next]);
                 // thedirectory = opendir(ptr[next]);
                 printf("\nproxima carpeta: %s\n",arr[next]);
-                printf(":LA CARPETA ABRIO CORRECTO SI NO DA NULL:: %s \n",thedirectory);
+                // printf(":LA CARPETA ABRIO CORRECTO SI NO DA NULL:: %s \n",thedirectory);
                 thefile = readdir(thedirectory);
                 // printf("marico\n");
                 next++;
@@ -326,10 +414,10 @@ int main(int argc, char* argv[])                                                
         
         // [Inode]
         if (i == 1 && pollito_mayor == 0) {
-            printf("%-10d ", thestat.st_ino);
+            printf("%-10zu ", thestat.st_ino);
         } else if (i == 1 && pollito_mayor == 1) {
             char str[30];
-            sprintf(str, "%d ", thestat.st_ino);
+            sprintf(str, "%zu ", thestat.st_ino);
             fputs(str, out);
         }
         
@@ -356,9 +444,6 @@ int main(int argc, char* argv[])                                                
                 default:       fputs("-", out); break; //unasigned
             }
         }
-        
-        
-        
 
         // [permissions]
         // http://linux.die.net/man/2/chmod 
@@ -389,10 +474,10 @@ int main(int argc, char* argv[])                                                
         // [number of hard links] 
         // http://www.gnu.org/software/libc/manual/html_node/Attribute-Meanings.html
         if (pollito_mayor == 0) {
-            printf(" %d ", thestat.st_nlink);
+            printf(" %zu ", thestat.st_nlink);
         } else {
             char str[30];
-            sprintf(str, " %d ", thestat.st_ino);
+            sprintf(str, " %zu ", thestat.st_ino);
             fputs(str, out);
         }
 
@@ -423,7 +508,7 @@ int main(int argc, char* argv[])                                                
             printf("%7zu ",thestat.st_size); // BYTES,         
         } else if ( h != 1 && pollito_mayor == 1 ) {
             char str[30];
-            sprintf(str, "%d ", thestat.st_size);
+            sprintf(str, "%zu ", thestat.st_size);
             fputs(str, out);
         } else if ( h == 1 && pollito_mayor == 0 ) {
             if (human_read(thestat.st_size) == 0) {
@@ -436,7 +521,7 @@ int main(int argc, char* argv[])                                                
         } else {
             if (human_read(thestat.st_size) == 0) {
                 char str[30];
-                sprintf(str, "%d ", thestat.st_size);
+                sprintf(str, "%zu ", thestat.st_size);
                 fputs(str, out);               
             } else if (human_read(thestat.st_size) < 800) {
                 char str[30];
@@ -450,7 +535,11 @@ int main(int argc, char* argv[])                                                
 
         }
         // [time of last modification] 
-        printf("%.12s ", ctime(&thestat.st_mtime)+4);
+        if (pollito_mayor == 1) {
+            fprintf(out,"%.12s ",ctime(&thestat.st_mtime)+4);
+        } else {
+            printf("%.12s ", ctime(&thestat.st_mtime)+4);
+        }
 
         if (R == 1 && directory == 1 && last_directory == 0 ) {
             if (strcmp("..", thefile->d_name ) == 0 || strcmp(".", thefile->d_name ) == 0) {
@@ -463,9 +552,14 @@ int main(int argc, char* argv[])                                                
         }
 
         // [filename]
-        printf("%s\n", thefile->d_name);
+        if (pollito_mayor == 1) {
+            fprintf(out,"%s\n ",thefile->d_name);
+        } else {
+            printf("%s\n", thefile->d_name);
+        }
+        
     }
-    
+
     if (final) {
         printf("EndOfPipe\n");
     }

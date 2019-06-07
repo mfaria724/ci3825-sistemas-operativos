@@ -266,7 +266,11 @@ void loop(void) {
     size_t buffsize = 1024;
     char *buffer = malloc(buffsize * sizeof(char*));
     fgets(buffer, buffsize, stdin);
-    
+
+    if (strcmp(buffer, "\n") == 0) {
+      continue;
+    }
+
     char *p1;
     char *p2;
     p1 = strtok(buffer, delim);
@@ -285,8 +289,10 @@ void loop(void) {
       executeWithPipe(args1, args2);
     } else {
       // If there is no pipe
-      args1 = splitLine(p1);      
-      executeCommand(args1);
+      if (p1) {
+        args1 = splitLine(p1);      
+        executeCommand(args1);
+      }
     }
     
   } while (1);
