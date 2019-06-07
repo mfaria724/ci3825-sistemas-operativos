@@ -17,7 +17,7 @@ void printFileProperties(struct stat stats, int G, int i, int h, int g, struct p
 {
     // [Inode]
     if (i == 1 && pollito_mayor == 0) {
-        printf("%-10zu ", staDEBUGts.st_ino);
+        printf("%-10zu ", stats.st_ino);
     } else if (i == 1 && pollito_mayor == 1) {
         char str[30];
         sprintf(str, "%zu ", stats.st_ino);
@@ -147,8 +147,6 @@ void printFileProperties(struct stat stats, int G, int i, int h, int g, struct p
         printf("%s\n", namefile);
     }
 
-    // [filename]
-    // printf("%s\n", namefile);
 }
 
 int main(int argc, char* argv[])                                                    
@@ -162,10 +160,8 @@ int main(int argc, char* argv[])
         //Defining Struct Directory (contains the path)
     if(argc == 2 && strcmp("~",argv[argc-1]) == 0) {
         
-        // printf("usage: ./ls [OPTION: -R, -G, -g, -i, -h, none]... [FILE]...\n");
         only_ls = 1;
         final = 1;
-        // exit(1);
     } else if (argc < 2) {
         only_ls = 1;
     }
@@ -213,7 +209,6 @@ int main(int argc, char* argv[])
             final = 1;
             c_re++;
         }
-        // printf("valor: %d", c_re);
         thedirectory = opendir(argv[argc-c_re]);
         base = argv[argc-c_re];
     } else {
@@ -222,12 +217,9 @@ int main(int argc, char* argv[])
             c_re++;
         }
         thedirectory = opendir(".");
-        base = "./";
+        strcpy(base,"./");
 
     }
-
-    // printf(":LA CARPETA ABRIO CORRECTO SI NO DA NULL:: %s \n",thedirectory);
-
         // Reading the flags
     for (int z = 1; z < argc-c_re ; z++) {
       combination = strlen(argv[z]);
@@ -240,44 +232,33 @@ int main(int argc, char* argv[])
             char letter = flags[w];
             if (letter == 'G') {
                 G = 1;
-                // printf("-G\n");
             } else if (letter == 'g') {
                 g = 1;
-                // printf("-g\n");
             } else if (letter == 'h') {
                 h = 1;
-                // printf("-h\n");
             } else if (letter == 'i') {
                 i = 1;
-                // printf("-i\n");
             } else if (letter == 'R') {
                 R = 1;
                 R2 = 1;
-                // printf("-R\n");
             } else {
                 printf("Unrecognized3 operation\n");
                 printf("EndOfPipe\n");
-                // exit(0);
             }
         }
 
       } else if( sig == '-') { 
         if (strcmp("-G", argv[z]) == 0) {
             G = 1;
-            // printf("-G\n");
         } else if (strcmp("-g", argv[z]) == 0) {
             g = 1;
-            // printf("-g\n");
         } else if (strcmp("-h", argv[z]) == 0) {
             h = 1;
-            // printf("-h\n");
         } else if (strcmp("-i", argv[z]) == 0) {
             i = 1;
-            // printf("-i\n");
         } else if (strcmp("-R", argv[z]) == 0) {
             R = 1;
             R2 = 1;
-            // printf("-R\n");
         } else {
             printf("Unrecognized4 operation\n");
             printf("EndOfPipe\n");
@@ -305,7 +286,7 @@ int main(int argc, char* argv[])
             // Get current directory
             thedirectory = opendir(".");
             pwdc = 1;
-            base = "./";
+            strcpy(base,"./");
 
             
             // Get Last Flag
@@ -316,20 +297,15 @@ int main(int argc, char* argv[])
                     char letter = current[w];
                     if (letter == 'G') {
                         G = 1;
-                        // printf("-G\n");
                     } else if (letter == 'g') {
                         g = 1;
-                        // printf("-g\n");
                     } else if (letter == 'h') {
                         h = 1;
-                        // printf("-h\n");
                     } else if (letter == 'i') {
                         i = 1;
-                        // printf("-i\n");
                     } else if (letter == 'R') {
                         R = 1;
                         R2 = 1;
-                        // printf("-R\n");
                     } else {
                         printf("Unrecognized operation\n");
                         printf("EndOfPipe\n");
@@ -340,20 +316,15 @@ int main(int argc, char* argv[])
             } else { 
                 if (strcmp("-G", current) == 0) {
                     G = 1;
-                    // printf("-G\n");
                 } else if (strcmp("-g", current) == 0) {
                     g = 1;
-                    // printf("-g\n");
                 } else if (strcmp("-h", current) == 0) {
                     h = 1;
-                    // printf("-h\n");
                 } else if (strcmp("-i", current) == 0) {
                     i = 1;
-                    // printf("-i\n");
                 } else if (strcmp("-R", current) == 0) {
                     R = 1;
                     R2 = 1;
-                    // printf("-R\n");
                 } else {
                     printf("Unrcognized operation\n");
                     printf("EndOfPipe\n");
@@ -368,7 +339,7 @@ int main(int argc, char* argv[])
     }
 
         // Used to -R. save all directory files.
-    char *arr[50] = {};
+    char *arr[500000] = {};
     char **ptr = arr; 
 
         // Main Reading files loop
@@ -378,37 +349,19 @@ int main(int argc, char* argv[])
         if (thefile == NULL) {
             last_directory = 1; 
             if (ptr[next] != NULL) {
-                // printf("\n./%s \n",arr[next]);
-                // thedirectory = opendir(ptr[next]);
                 char* var_dir = arr[next];
-                // printf("\nDEBUG ANTES %s base:%s  var_dir:%s\n", arr[0], base, var_dir);
-                // var_dir = ".vscode";
                 if (strcmp(base,".") == 0){
-                    base = "./";
-                    // printf("\nDEBUG ANTES %s base:%s  var_dir:%s\n", arr[0], base, var_dir);
+                    strcpy(base,"./");
                 }
                 strcat(base,var_dir);
-                // printf("DEBUG11 %s base: %s\n", arr[0], base);
-                // printf("BASE : %s", base);
                 printf("\n%s\n",base);
                 thedirectory = opendir(base);
-                // printf(":LA CARPETA ABRIO CORRECTO SI NO DA NULL:: %s \n",thedirectory);
                 thefile = readdir(thedirectory);
                 next++;
             } else {
                 break;
             }
         }
-
-        // To NOT show .. and . files
-        // if (strcmp("..", thefile->d_name ) == 0 || strcmp(".", thefile->d_name ) == 0) {
-        //     // thefile = readdir(thedirectory);
-        //     // printf("Encontre el 1 \n");
-        // } 
-        // if (strcmp(".", thefile->d_name) == 0 || strcmp("..", thefile->d_name ) == 0) {
-        //     // thefile = readdir(thedirectory);
-        //     // printf("Encontre el 2 \n");
-        // }
         
         // Used to get all Directory to -R
         int directory = 0;
@@ -560,8 +513,6 @@ int main(int argc, char* argv[])
 
         if (R == 1 && directory == 1 && last_directory == 0 ) {
             if (strcmp("..", thefile->d_name ) == 0 || strcmp(".", thefile->d_name ) == 0) {
-            // thefile = readdir(thedirectory);
-            // printf("Encontre el 1 \n");
             } else {
                 ptr[counter] = thefile->d_name;
                 counter++;
